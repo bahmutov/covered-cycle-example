@@ -57,7 +57,8 @@
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
     "build": "webpack && ls -l dist",
     "server": "http-server",
-    "proxy": "rm -rf html-report scripts && was-tested --target http://127.0.0.1:8080"
+    "proxy": "rm -rf html-report scripts && was-tested --target http://127.0.0.1:8080",
+    "nyc": "nyc node shake-example/code.js"
   },
   "devDependencies": {
     "ban-sensitive-files": "1.8.2",
@@ -66,6 +67,7 @@
     "license-checker": "5.1.0",
     "mocha": "2.4.5",
     "nsp": "2.3.0",
+    "nyc": "6.4.0",
     "pre-git": "3.8.3",
     "semantic-release": "^4.3.5",
     "standard": "6.0.8",
@@ -76,6 +78,8 @@
   "dependencies": {
     "@cycle/core": "6.0.3",
     "@cycle/dom": "9.4.0",
+    "check-more-types": "2.20.2",
+    "lazy-ass": "1.4.0",
     "rx": "4.1.0"
   }
 }
