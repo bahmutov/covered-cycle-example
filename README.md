@@ -8,7 +8,8 @@
 [![semantic-release][semantic-image] ][semantic-url]
 [![js-standard-style][standard-image]][standard-url]
 
-![screenshot](covered-cycle-app.png)
+![screenshot](screenshots/covered-cycle-app.png)
+![initial coverage](screenshots/coverage-initial.png)
 
 ### Small print
 

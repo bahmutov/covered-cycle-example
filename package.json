@@ -55,11 +55,14 @@
     "test": "npm run unit",
     "unit": "mocha src/*-spec.js",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post",
-    "build": "webpack && ls -l dist"
+    "build": "webpack && ls -l dist",
+    "server": "http-server",
+    "proxy": "rm -rf html-report scripts && was-tested --target http://127.0.0.1:8080"
   },
   "devDependencies": {
     "ban-sensitive-files": "1.8.2",
     "git-issues": "1.2.0",
+    "http-server": "0.9.0",
     "license-checker": "5.1.0",
     "mocha": "2.4.5",
     "nsp": "2.3.0",
@@ -67,6 +70,7 @@
     "semantic-release": "^4.3.5",
     "standard": "6.0.8",
     "standard-format": "2.1.1",
+    "was-tested": "0.10.0",
     "webpack": "1.12.15"
   },
   "dependencies": {
