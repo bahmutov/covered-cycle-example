@@ -55,6 +55,7 @@ console.log('has coverage information about', Object.keys(fnMap).length, 'functi
 //   console.log('function', fn.name, fn, 'is covered?', f[k])
 // })
 
+var foundFunctions = 0
 var removed = 0
 
 function findCoveredFunction(line, column) {
@@ -75,28 +76,10 @@ function findCoveredFunction(line, column) {
   return found
 }
 
-function setCharAt(str,index,chr) {
-  if(index > str.length-1) return str;
-  return str.substr(0,index) + chr + str.substr(index+1);
-}
-
-function blank (text, from, to) {
-  la(is.unemptyString(text), 'missing text', text)
-  la(is.number(from), 'missing from index', from)
-  la(is.number(to), 'missing to index', to)
-  la(to >= from, 'invalid from and to', from, to)
-
-  var k
-  for (k = from; k < to; k += 1) {
-    text = setCharAt(text, k, ' ')
-  }
-  return text
-}
-
-var sourceBlanked = source
 function walk(node, index, list) {
   // console.log(node.type)
   if (node.type === 'FunctionDeclaration') {
+    foundFunctions += 1
     // console.log(node.id.name)
     const line = node.loc.start.line
     const column = node.loc.start.column
@@ -111,6 +94,7 @@ function walk(node, index, list) {
     }
   }
   if (node.type === 'FunctionExpression') {
+    foundFunctions += 1
     // console.log(node.id.name)
     const line = node.loc.start.line
     const column = node.loc.start.column
@@ -174,5 +158,5 @@ const codeOptions = {
 const output = escodegen.generate(parsed, codeOptions)
 const outputFilename = './dist/app-covered.js'
 fs.writeFileSync(outputFilename, output, 'utf8')
-console.log('removed %d unused functions', removed)
+console.log('removed %d unused functions from %d found', removed, foundFunctions)
 console.log('output code with uncovered functions removed saved to', outputFilename)
