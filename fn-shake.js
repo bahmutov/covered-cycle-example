@@ -20,7 +20,7 @@ const parseOptions = {
 const source = fs.readFileSync(sourceFilename, 'utf8')
 const parsed = esprima.parse(source, parseOptions)
 console.log('parsed', sourceFilename)
-console.log(parsed)
+// console.log(parsed)
 
 la(is.has(cover, sourceName), 'missing coverage for', sourceName, 'in', coverFilename)
 const scriptCover = cover[sourceName]
@@ -32,10 +32,10 @@ la(is.object(f), 'missing function coverage object')
 const fnMap = scriptCover.fnMap
 la(is.object(fnMap), 'missing function map')
 console.log('has coverage information about', Object.keys(fnMap).length, 'functions')
-Object.keys(fnMap).forEach((k) => {
-  const fn = fnMap[k]
-  console.log('function', fn.name, fn, 'is covered?', f[k])
-})
+// Object.keys(fnMap).forEach((k) => {
+//   const fn = fnMap[k]
+//   console.log('function', fn.name, fn, 'is covered?', f[k])
+// })
 
 function findCoveredFunction(line, column) {
   la(is.number(line) && is.number(column),
@@ -75,12 +75,14 @@ function blank (text, from, to) {
 
 var sourceBlanked = source
 function walk(node, parent, index) {
-  console.log(node.type)
+  // console.log(node.type)
   if (node.type === 'FunctionDeclaration') {
-    console.log(node.id.name, 'at', node.loc, node.range)
-    const info = findCoveredFunction(node.loc.start.line, node.loc.start.column)
+    const line = node.loc.start.line
+    const column = node.loc.start.column
+    console.log('function "%s" starts at line %d column %d', node.id.name, line, column)
+    const info = findCoveredFunction(line, column)
     if (info && !info.covered) {
-      console.log('removing function', node.id.name, 'from source')
+      console.log('function "%s" is not covered, removing', node.id.name)
       // sourceBlanked = blank(sourceBlanked, Number(node.range[0]), Number(node.range[1]))
       // console.log(parent)
       parent.body.splice(index, 1)
@@ -92,9 +94,9 @@ function walk(node, parent, index) {
 }
 walk(parsed)
 
-console.log('removed uncovered functions')
-console.log(sourceBlanked)
+// console.log('removed uncovered functions')
+// console.log(sourceBlanked)
 
 const output = escodegen.generate(parsed)
-console.log('generated')
+console.log('output code with uncovered functions removed')
 console.log(output)
