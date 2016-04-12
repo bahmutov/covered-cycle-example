@@ -6,6 +6,14 @@ const fs = require('fs')
 const esprima = require('esprima')
 const escodegen = require('escodegen')
 
+// do not remove some functions for now
+const keepFunctions = [
+  'Item', 'noop', 'SoftSetHook', 'EvStore', 'EvHook', 'SVGAttributeNamespace',
+  'AttributeHook', 'svg', 'updateWidget', 'escapeHtml', 'extend', 'createAttribute',
+  'toHTML', 'makeBogusSelect', 'makeHTMLDriver', 'mockDOMSource',
+  'defaultOnErrorFn', 'isolateSource', 'isolateSink', 'ascending'
+]
+
 const coverFilename = './scripts/coverage.json'
 la(fs.existsSync(coverFilename), 'missing coverage file', coverFilename)
 const cover = require(coverFilename)
@@ -38,6 +46,8 @@ console.log('has coverage information about', Object.keys(fnMap).length, 'functi
 //   const fn = fnMap[k]
 //   console.log('function', fn.name, fn, 'is covered?', f[k])
 // })
+
+var removed = 0
 
 function findCoveredFunction(line, column) {
   la(is.number(line) && is.number(column),
@@ -76,43 +86,48 @@ function blank (text, from, to) {
 }
 
 var sourceBlanked = source
-function walk(node, parent, index) {
-  console.log(node.type)
-  if (node.type === 'ExpressionStatement') {
-    console.log(node)
-  }
+function walk(node, index, list) {
+  // console.log(node.type)
   if (node.type === 'FunctionDeclaration') {
-    console.log(node.id.name)
-    console.log(node)
+    // console.log(node.id.name)
     const line = node.loc.start.line
     const column = node.loc.start.column
     console.log('function "%s" starts at line %d column %d', node.id.name, line, column)
     const info = findCoveredFunction(line, column)
     if (info && !info.covered) {
-      console.log('function "%s" is not covered, removing', node.id.name)
-      // sourceBlanked = blank(sourceBlanked, Number(node.range[0]), Number(node.range[1]))
-      // console.log(parent)
-      parent.body.splice(index, 1)
+      if (!is.oneOf(keepFunctions, node.id.name)) {
+        console.log('function "%s" is not covered, removing', node.id.name)
+        list.splice(index, 1)
+        removed += 1
+      }
     }
   }
   if (Array.isArray(node.body)) {
-    node.body.forEach((child, k) => walk(child, node, k))
+    node.body.forEach(walk)
   }
   if (is.object(node.body)) {
-    console.log('node.body is an object')
     walk(node.body)
   }
   if (is.object(node.expression)) {
     walk(node.expression)
   }
+  if (node.left) {
+    walk(node.left)
+  }
+  if (node.right) {
+    walk(node.right)
+  }
   if (node.callee && node.callee.body) {
     walk(node.callee.body)
   }
+  if (Array.isArray(node.arguments)) {
+    node.arguments.forEach(walk)
+  }
+  if (Array.isArray(node.elements)) {
+    node.elements.forEach(walk)
+  }
 }
 walk(parsed)
-
-// console.log('removed uncovered functions')
-// console.log(sourceBlanked)
 
 const codeOptions = {
   format: {
@@ -125,4 +140,5 @@ const codeOptions = {
 const output = escodegen.generate(parsed, codeOptions)
 const outputFilename = './dist/app-covered.js'
 fs.writeFileSync(outputFilename, output, 'utf8')
+console.log('removed %d unused functions', removed)
 console.log('output code with uncovered functions removed saved to', outputFilename)

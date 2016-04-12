@@ -9624,17 +9624,6 @@
     var draining = false;
     var currentQueue;
     var queueIndex = -1;
-    function cleanUpNextTick() {
-      draining = false;
-      if (currentQueue.length) {
-        queue = currentQueue.concat(queue)
-      } else {
-        queueIndex = -1
-      }
-      if (queue.length) {
-        drainQueue()
-      }
-    }
     function drainQueue() {
       if (draining) {
         return
@@ -9806,9 +9795,6 @@
       }
       return h(tagName, properties, children)
     }
-    function isObservable(x) {
-      return x && typeof x.subscribe === 'function'
-    }
     function isChildren(x) {
       return typeof x === 'string' || isArray(x) || isObservable(x)
     }
@@ -9816,10 +9802,7 @@
   function (module, exports) {
     var nativeIsArray = Array.isArray;
     var toString = Object.prototype.toString;
-    module.exports = nativeIsArray || isArray;
-    function isArray(obj) {
-      return toString.call(obj) === '[object Array]'
-    }
+    module.exports = nativeIsArray || isArray
   },
   function (module, exports, __webpack_require__) {
     'use strict';
@@ -9905,15 +9888,6 @@
     }
     function isChildren(x) {
       return typeof x === 'string' || isArray(x) || isChild(x)
-    }
-    function UnexpectedVirtualElement(data) {
-      var err = new Error();
-      err.type = 'virtual-hyperscript.unexpected.virtual-element';
-      err.message = 'Unexpected virtual child passed to h().\n' + 'Expected a VNode / Vthunk / VWidget / string but:\n' + 'got:\n' + errorString(data.foreignObject) + '.\n' + 'The parent vnode is:\n' + errorString(data.parentVnode);
-      '\n' + 'Suggested fix: change your `h(..., [ ... ])` callsite.';
-      err.foreignObject = data.foreignObject;
-      err.parentVnode = data.parentVnode;
-      return err
     }
     function errorString(obj) {
       try {
@@ -11009,10 +10983,6 @@
       }
       return apply
     }
-    function clearState(vNode, patch, index) {
-      unhook(vNode, patch, index);
-      destroyWidgets(vNode, patch, index)
-    }
     function destroyWidgets(vNode, patch, index) {
       if (isWidget(vNode)) {
         if (typeof vNode.destroy === 'function') {
@@ -11033,13 +11003,6 @@
         thunks(vNode, null, patch, index)
       }
     }
-    function thunks(a, b, patch, index) {
-      var nodes = handleThunk(a, b);
-      var thunkPatch = diff(nodes.a, nodes.b);
-      if (hasPatches(thunkPatch)) {
-        patch[index] = new VPatch(VPatch.THUNK, null, thunkPatch)
-      }
-    }
     function hasPatches(patch) {
       for (var index in patch) {
         if (index !== 'a') {
@@ -11047,27 +11010,6 @@
         }
       }
       return false
-    }
-    function unhook(vNode, patch, index) {
-      if (isVNode(vNode)) {
-        if (vNode.hooks) {
-          patch[index] = appendPatch(patch[index], new VPatch(VPatch.PROPS, vNode, undefinedKeys(vNode.hooks)))
-        }
-        if (vNode.descendantHooks || vNode.hasThunks) {
-          var children = vNode.children;
-          var len = children.length;
-          for (var i = 0; i < len; i++) {
-            var child = children[i];
-            index += 1;
-            unhook(child, patch, index);
-            if (isVNode(child) && child.count) {
-              index += child.count
-            }
-          }
-        }
-      } else if (isThunk(vNode)) {
-        thunks(vNode, null, patch, index)
-      }
     }
     function undefinedKeys(obj) {
       var result = {};
@@ -11196,13 +11138,6 @@
         }
       }
     }
-    function remove(arr, index, key) {
-      arr.splice(index, 1);
-      return {
-        from: index,
-        key: key
-      }
-    }
     function keyIndex(children) {
       var keys = {};
       var free = [];
@@ -11276,16 +11211,6 @@
         b: renderedB
       }
     }
-    function renderThunk(thunk, previous) {
-      var renderedThunk = thunk.vnode;
-      if (!renderedThunk) {
-        renderedThunk = thunk.vnode = thunk.render(previous)
-      }
-      if (!(isVNode(renderedThunk) || isVText(renderedThunk) || isWidget(renderedThunk))) {
-        throw new Error('thunk did not return a valid node')
-      }
-      return renderedThunk
-    }
   },
   function (module, exports, __webpack_require__) {
     var isObject = __webpack_require__(33);
@@ -11328,15 +11253,6 @@
         }
       }
       return diff
-    }
-    function getPrototype(value) {
-      if (Object.getPrototypeOf) {
-        return Object.getPrototypeOf(value)
-      } else if (value.__proto__) {
-        return value.__proto__
-      } else if (value.constructor) {
-        return value.constructor.prototype
-      }
     }
   },
   function (module, exports) {
@@ -11485,28 +11401,6 @@
         }
       }
     }
-    function removeProperty(node, propName, propValue, previous) {
-      if (previous) {
-        var previousValue = previous[propName];
-        if (!isHook(previousValue)) {
-          if (propName === 'attributes') {
-            for (var attrName in previousValue) {
-              node.removeAttribute(attrName)
-            }
-          } else if (propName === 'style') {
-            for (var i in previousValue) {
-              node.style[i] = ''
-            }
-          } else if (typeof previousValue === 'string') {
-            node[propName] = ''
-          } else {
-            node[propName] = null
-          }
-        } else if (previousValue.unhook) {
-          previousValue.unhook(node, propName, propValue)
-        }
-      }
-    }
     function patchObject(node, props, previous, propName, propValue) {
       var previousValue = previous ? previous[propName] : undefined;
       if (propName === 'attributes') {
@@ -11531,15 +11425,6 @@
       for (var k in propValue) {
         var value = propValue[k];
         node[propName][k] = value === undefined ? replacer : value
-      }
-    }
-    function getPrototype(value) {
-      if (Object.getPrototypeOf) {
-        return Object.getPrototypeOf(value)
-      } else if (value.__proto__) {
-        return value.__proto__
-      } else if (value.constructor) {
-        return value.constructor.prototype
       }
     }
   },
@@ -11636,14 +11521,6 @@
         return domNode
       }
     }
-    function removeNode(domNode, vNode) {
-      var parentNode = domNode.parentNode;
-      if (parentNode) {
-        parentNode.removeChild(domNode)
-      }
-      destroyWidget(domNode, vNode);
-      return null
-    }
     function insertNode(parentNode, vNode, renderOptions) {
       var newNode = renderOptions.render(vNode, renderOptions);
       if (parentNode) {
@@ -11665,23 +11542,6 @@
       }
       return newNode
     }
-    function widgetPatch(domNode, leftVNode, widget, renderOptions) {
-      var updating = updateWidget(leftVNode, widget);
-      var newNode;
-      if (updating) {
-        newNode = widget.update(leftVNode, domNode) || domNode
-      } else {
-        newNode = renderOptions.render(widget, renderOptions)
-      }
-      var parentNode = domNode.parentNode;
-      if (parentNode && newNode !== domNode) {
-        parentNode.replaceChild(newNode, domNode)
-      }
-      if (!updating) {
-        destroyWidget(domNode, leftVNode)
-      }
-      return newNode
-    }
     function vNodePatch(domNode, leftVNode, vNode, renderOptions) {
       var parentNode = domNode.parentNode;
       var newNode = renderOptions.render(vNode, renderOptions);
@@ -11689,11 +11549,6 @@
         parentNode.replaceChild(newNode, domNode)
       }
       return newNode
-    }
-    function destroyWidget(domNode, w) {
-      if (typeof w.destroy === 'function' && isWidget(w)) {
-        w.destroy(domNode)
-      }
     }
     function reorderChildren(domNode, moves) {
       var childNodes = domNode.childNodes;
@@ -11715,12 +11570,6 @@
         node = keyMap[insert.key];
         domNode.insertBefore(node, insert.to >= length++ ? null : childNodes[insert.to])
       }
-    }
-    function replaceRoot(oldRoot, newRoot) {
-      if (oldRoot && newRoot && oldRoot !== newRoot && oldRoot.parentNode) {
-        oldRoot.parentNode.replaceChild(newRoot, oldRoot)
-      }
-      return newRoot
     }
   },
   function (module, exports, __webpack_require__) {
@@ -11774,9 +11623,6 @@
         return createVirtualDomNode(el, attr)
       }
       return new VText('')
-    }
-    function createVirtualTextNode(el) {
-      return new VText(el.nodeValue)
     }
     function createVirtualDomNode(el, attr) {
       var ns = el.namespaceURI !== HTML_NAMESPACE ? el.namespaceURI : null;
@@ -11851,14 +11697,6 @@
         name: name,
         value: value,
         isAttr: isAttr || false
-      }
-    }
-    function createPropertyNS(attr) {
-      var name, value;
-      return {
-        name: attr.name,
-        value: attr.value,
-        ns: namespaceMap[attr.name] || ''
       }
     }
   },
@@ -12393,38 +12231,6 @@
       }
       return ''
     }
-    function openTag(node) {
-      var props = node.properties;
-      var ret = '<' + node.tagName.toLowerCase();
-      for (var name in props) {
-        var value = props[name];
-        if (value == null)
-          continue;
-        if (name == 'attributes') {
-          value = extend({}, value);
-          for (var attrProp in value) {
-            ret += ' ' + createAttribute(attrProp, value[attrProp], true)
-          }
-          continue
-        }
-        if (name == 'style') {
-          var css = '';
-          value = extend({}, value);
-          for (var styleProp in value) {
-            css += paramCase(styleProp) + ': ' + value[styleProp] + '; '
-          }
-          value = css.trim()
-        }
-        if (value instanceof softHook || value instanceof attrHook) {
-          ret += ' ' + createAttribute(name, value.value, true);
-          continue
-        }
-        var attr = createAttribute(name, value);
-        if (attr)
-          ret += ' ' + attr
-      }
-      return ret + '>'
-    }
     function tagContent(node) {
       var innerHTML = node.properties.innerHTML;
       if (innerHTML != null)
@@ -12439,10 +12245,6 @@
         }
         return ret
       }
-    }
-    function closeTag(node) {
-      var tag = node.tagName.toLowerCase();
-      return voidElements[tag] ? '' : '</' + tag + '>'
     }
   },
   function (module, exports) {
@@ -12520,12 +12322,6 @@
         return ''
       }
       replacement = replacement || ' ';
-      function replace(match, index, string) {
-        if (index === 0 || index === string.length - match.length) {
-          return ''
-        }
-        return replacement
-      }
       str = String(str).replace(CAMEL_CASE_REGEXP, '$1 $2').replace(TRAILING_DIGIT_REGEXP, '$1 $2').replace(NON_WORD_REGEXP, replace);
       return lowerCase(str, locale)
     }
@@ -12606,10 +12402,6 @@
         return prefixAttribute(name) + escape(value) + '"'
       }
       return null
-    }
-    function shouldSkip(name, value) {
-      var attrType = properties[name];
-      return value == null || attrType === types.BOOLEAN && !value || attrType === types.OVERLOADED_BOOLEAN && value === false
     }
     function memoizeString(callback) {
       var cache = {};
@@ -12777,16 +12569,6 @@
     var _rx = __webpack_require__(2);
     var _rx2 = _interopRequireDefault(_rx);
     var emptyStream = _rx2['default'].Observable.empty();
-    function getEventsStreamForSelector(mockedEventTypes) {
-      return function getEventsStream(eventType) {
-        for (var key in mockedEventTypes) {
-          if (mockedEventTypes.hasOwnProperty(key) && key === eventType) {
-            return mockedEventTypes[key]
-          }
-        }
-        return emptyStream
-      }
-    }
     function makeMockSelector(mockedSelectors) {
       return function select(selector) {
         for (var key in mockedSelectors) {
