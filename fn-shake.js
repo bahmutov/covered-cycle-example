@@ -97,6 +97,14 @@ walk(parsed)
 // console.log('removed uncovered functions')
 // console.log(sourceBlanked)
 
-const output = escodegen.generate(parsed)
+const codeOptions = {
+  format: {
+    indent: {
+      style: '  '
+    },
+    semicolons: false
+  }
+}
+const output = escodegen.generate(parsed, codeOptions)
 console.log('output code with uncovered functions removed')
 console.log(output)
