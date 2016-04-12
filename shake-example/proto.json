@@ -1,0 +1,89 @@
+{
+  "proto.js": {
+    "path": "proto.js",
+    "s": {
+      "1": 1,
+      "2": 1,
+      "3": 0,
+      "4": 1
+    },
+    "b": {},
+    "f": {
+      "1": 0,
+      "2": 0
+    },
+    "fnMap": {
+      "1": {
+        "name": "Foo",
+        "line": 1,
+        "loc": {
+          "start": {
+            "line": 1,
+            "column": 0
+          },
+          "end": {
+            "line": 1,
+            "column": 15
+          }
+        }
+      },
+      "2": {
+        "name": "foo",
+        "line": 4,
+        "loc": {
+          "start": {
+            "line": 4,
+            "column": 20
+          },
+          "end": {
+            "line": 4,
+            "column": 35
+          }
+        }
+      }
+    },
+    "statementMap": {
+      "1": {
+        "start": {
+          "line": 1,
+          "column": 0
+        },
+        "end": {
+          "line": 3,
+          "column": 1
+        }
+      },
+      "2": {
+        "start": {
+          "line": 4,
+          "column": 0
+        },
+        "end": {
+          "line": 6,
+          "column": 1
+        }
+      },
+      "3": {
+        "start": {
+          "line": 5,
+          "column": 2
+        },
+        "end": {
+          "line": 5,
+          "column": 12
+        }
+      },
+      "4": {
+        "start": {
+          "line": 7,
+          "column": 0
+        },
+        "end": {
+          "line": 7,
+          "column": 47
+        }
+      }
+    },
+    "branchMap": {}
+  }
+}
