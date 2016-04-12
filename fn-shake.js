@@ -17,9 +17,26 @@ function shouldKeep (fnNode) {
     'Item', 'noop', 'SoftSetHook', 'EvStore', 'EvHook', 'SVGAttributeNamespace',
     'AttributeHook', 'svg', 'updateWidget', 'escapeHtml', 'extend', 'createAttribute',
     'toHTML', 'makeBogusSelect', 'makeHTMLDriver', 'mockDOMSource',
-    'defaultOnErrorFn', 'isolateSource', 'isolateSink', 'ascending'
+    'defaultOnErrorFn', 'isolateSource', 'isolateSink', 'ascending',
+    // bunch of prototype functions, most from RxJs
+    'SchedulePeriodicRecursive', 'OnNextNotification',
+    'ImmediateScheduler', 'CatchScheduler', 'Notification', 'OnErrorNotification',
+    'OnCompletedNotification', 'CheckedObserver', 'ObserveOnObserver',
+    'IsDisposedDisposable', 'ConcatEnumerableObservable', 'InnerObserver',
+    'CatchErrorObservable', 'RepeatEnumerable', 'RepeatEnumerator',
+    'OfEnumerable', 'OfEnumerator',
+    'Defer', 'EmptySink', 'FromObservable', 'StringIterable', 'StringIterator', 'ArrayIterable',
+    'ArrayIterator', 'GenerateObservable', 'PairsObservable', 'RangeObservable', 'RepeatObservable',
+    'RepeatSink', 'ThrowObservable', 'UsingObservable', 'ControlledSubject', 'WhileEnumerable',
+    'Pattern', 'Plan', 'ActivePlan', 'DelaySubscription', 'VirtualTimeScheduler',
+    'HistoricalScheduler', 'OnNextPredicate', 'OnErrorPredicate', 'MockPromise',
+    'TestScheduler', 'AsyncSubject', 'BehaviorSubject', 'AnonymousSubject', 'Pauser'
   ]
-  return is.oneOf(keepFunctions, fnNode.id.name)
+  const name = fnNode.id.name
+  return is.oneOf(keepFunctions, name) ||
+    /Observable$/.test(name) ||
+    /Observer$/.test(name) ||
+    /Disposable$/.test(name)
 }
 
 const coverFilename = './scripts/coverage.json'
@@ -87,7 +104,7 @@ function walk(node, index, list) {
     const info = findCoveredFunction(line, column)
     if (info && !info.covered) {
       if (!shouldKeep(node)) {
-        console.log('function "%s" is not covered, removing', node.id.name)
+        // console.log('function "%s" is not covered, removing', node.id.name)
         list.splice(index, 1)
         removed += 1
       }
@@ -102,14 +119,14 @@ function walk(node, index, list) {
     const info = findCoveredFunction(line, column)
     if (info && !info.covered) {
       if (!shouldKeep(node)) {
-        console.log('function expression "%s" is not covered, removing',
-          (node.id ? node.id.name : 'unnamed'))
+        // console.log('function expression "%s" is not covered, removing',
+        //   (node.id ? node.id.name : 'unnamed'))
         if (Array.isArray(list)) {
           list.splice(index, 1)
+          removed += 1
         } else {
-          console.log('cannot remove - no parent list')
+          // console.log('cannot remove - no parent list')
         }
-        removed += 1
       }
     }
   }
@@ -120,6 +137,12 @@ function walk(node, index, list) {
   if (is.object(node.body)) {
     walk(node.body)
   }
+  if (is.object(node.object)) {
+    walk(node.object)
+  }
+  if (is.object(node.argument)) {
+    walk(node.argument)
+  }
   if (is.object(node.expression)) {
     walk(node.expression)
   }
@@ -128,6 +151,9 @@ function walk(node, index, list) {
   }
   if (node.right) {
     walk(node.right)
+  }
+  if (is.object(node.callee)) {
+    walk(node.callee)
   }
   if (node.callee && node.callee.body) {
     walk(node.callee.body)
