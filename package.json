@@ -63,8 +63,14 @@
     "mocha": "2.4.5",
     "nsp": "2.3.0",
     "pre-git": "3.8.3",
+    "semantic-release": "^4.3.5",
     "standard": "6.0.8",
     "standard-format": "2.1.1",
-    "semantic-release": "^4.3.5"
+    "webpack": "1.12.15"
+  },
+  "dependencies": {
+    "@cycle/core": "6.0.3",
+    "@cycle/dom": "9.4.0",
+    "rx": "4.1.0"
   }
 }
