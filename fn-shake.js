@@ -78,7 +78,12 @@ function blank (text, from, to) {
 var sourceBlanked = source
 function walk(node, parent, index) {
   console.log(node.type)
+  if (node.type === 'ExpressionStatement') {
+    console.log(node)
+  }
   if (node.type === 'FunctionDeclaration') {
+    console.log(node.id.name)
+    console.log(node)
     const line = node.loc.start.line
     const column = node.loc.start.column
     console.log('function "%s" starts at line %d column %d', node.id.name, line, column)
@@ -92,8 +97,16 @@ function walk(node, parent, index) {
   }
   if (Array.isArray(node.body)) {
     node.body.forEach((child, k) => walk(child, node, k))
-  } else if (is.object(node.body)) {
+  }
+  if (is.object(node.body)) {
+    console.log('node.body is an object')
     walk(node.body)
+  }
+  if (is.object(node.expression)) {
+    walk(node.expression)
+  }
+  if (node.callee && node.callee.body) {
+    walk(node.callee.body)
   }
 }
 walk(parsed)
