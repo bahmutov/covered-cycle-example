@@ -23,9 +23,9 @@ function walk(node, parent, index) {
   // if (node.type === 'ExpressionStatement') {
   //   console.log(node)
   // }
-  // if (node.type === 'CallExpression') {
-  //   console.log(node)
-  // }
+  if (node.type === 'ReturnStatement') {
+    console.log(node)
+  }
   // if (node.type === 'ArrayExpression') {
   //   console.log(node)
   // }
@@ -48,6 +48,15 @@ function walk(node, parent, index) {
   if (is.object(node.body)) {
     // console.log('node.body is an object')
     walk(node.body)
+  }
+  if (is.object(node.callee)) {
+    walk(node.callee)
+  }
+  if (is.object(node.object)) {
+    walk(node.object)
+  }
+  if (is.object(node.argument)) {
+    walk(node.argument)
   }
   if (is.object(node.expression)) {
     walk(node.expression)
