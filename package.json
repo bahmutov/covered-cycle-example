@@ -58,7 +58,7 @@
     "build": "webpack && ls -l dist",
     "server": "http-server",
     "proxy": "rm -rf html-report scripts && was-tested --target http://127.0.0.1:8080",
-    "nyc": "nyc node shake-example/code.js"
+    "nyc": "nyc node shake-example/closure.js"
   },
   "devDependencies": {
     "ban-sensitive-files": "1.8.2",

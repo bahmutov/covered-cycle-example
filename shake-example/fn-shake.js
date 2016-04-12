@@ -6,15 +6,11 @@ const fs = require('fs')
 const esprima = require('esprima')
 const escodegen = require('escodegen')
 
-const coverFilename = './scripts/coverage.json'
-la(fs.existsSync(coverFilename), 'missing coverage file', coverFilename)
+const coverFilename = './coverage.json'
+const sourceName = 'code.js'
 const cover = require(coverFilename)
-const sourceName = 'app.js'
-// const coverFilename = './shake-example/coverage.json'
-// const sourceName = 'code.js'
 
-const sourceFilename = './dist/app.js'
-la(fs.existsSync(sourceFilename), 'missing source file', sourceFilename)
+const sourceFilename = './code.js'
 const parseOptions = {
   loc: true,
   range: true
@@ -77,7 +73,7 @@ function blank (text, from, to) {
 
 var sourceBlanked = source
 function walk(node, parent, index) {
-  console.log(node.type)
+  // console.log(node.type)
   if (node.type === 'FunctionDeclaration') {
     const line = node.loc.start.line
     const column = node.loc.start.column
@@ -92,8 +88,6 @@ function walk(node, parent, index) {
   }
   if (Array.isArray(node.body)) {
     node.body.forEach((child, k) => walk(child, node, k))
-  } else if (is.object(node.body)) {
-    walk(node.body)
   }
 }
 walk(parsed)
@@ -110,6 +104,5 @@ const codeOptions = {
   }
 }
 const output = escodegen.generate(parsed, codeOptions)
-const outputFilename = './dist/app-covered.js'
-fs.writeFileSync(outputFilename, output, 'utf8')
-console.log('output code with uncovered functions removed saved to', outputFilename)
+console.log('output code with uncovered functions removed')
+console.log(output)
