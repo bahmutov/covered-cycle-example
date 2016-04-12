@@ -7,12 +7,20 @@ const esprima = require('esprima')
 const escodegen = require('escodegen')
 
 // do not remove some functions for now
-const keepFunctions = [
-  'Item', 'noop', 'SoftSetHook', 'EvStore', 'EvHook', 'SVGAttributeNamespace',
-  'AttributeHook', 'svg', 'updateWidget', 'escapeHtml', 'extend', 'createAttribute',
-  'toHTML', 'makeBogusSelect', 'makeHTMLDriver', 'mockDOMSource',
-  'defaultOnErrorFn', 'isolateSource', 'isolateSink', 'ascending'
-]
+function shouldKeep (fnNode) {
+  la(is.object(fnNode), 'not function node', fnNode)
+  if (!fnNode.id) {
+    return
+  }
+  la(is.unemptyString(fnNode.id.name), 'missing function name', fnNode)
+  const keepFunctions = [
+    'Item', 'noop', 'SoftSetHook', 'EvStore', 'EvHook', 'SVGAttributeNamespace',
+    'AttributeHook', 'svg', 'updateWidget', 'escapeHtml', 'extend', 'createAttribute',
+    'toHTML', 'makeBogusSelect', 'makeHTMLDriver', 'mockDOMSource',
+    'defaultOnErrorFn', 'isolateSource', 'isolateSink', 'ascending'
+  ]
+  return is.oneOf(keepFunctions, fnNode.id.name)
+}
 
 const coverFilename = './scripts/coverage.json'
 la(fs.existsSync(coverFilename), 'missing coverage file', coverFilename)
@@ -92,16 +100,36 @@ function walk(node, index, list) {
     // console.log(node.id.name)
     const line = node.loc.start.line
     const column = node.loc.start.column
-    console.log('function "%s" starts at line %d column %d', node.id.name, line, column)
+    // console.log('function "%s" starts at line %d column %d', node.id.name, line, column)
     const info = findCoveredFunction(line, column)
     if (info && !info.covered) {
-      if (!is.oneOf(keepFunctions, node.id.name)) {
+      if (!shouldKeep(node)) {
         console.log('function "%s" is not covered, removing', node.id.name)
         list.splice(index, 1)
         removed += 1
       }
     }
   }
+  if (node.type === 'FunctionExpression') {
+    // console.log(node.id.name)
+    const line = node.loc.start.line
+    const column = node.loc.start.column
+    // console.log('function expressions "%s" starts at line %d column %d', node.id.name, line, column)
+    const info = findCoveredFunction(line, column)
+    if (info && !info.covered) {
+      if (!shouldKeep(node)) {
+        console.log('function expression "%s" is not covered, removing',
+          (node.id ? node.id.name : 'unnamed'))
+        if (Array.isArray(list)) {
+          list.splice(index, 1)
+        } else {
+          console.log('cannot remove - no parent list')
+        }
+        removed += 1
+      }
+    }
+  }
+
   if (Array.isArray(node.body)) {
     node.body.forEach(walk)
   }
@@ -125,6 +153,12 @@ function walk(node, index, list) {
   }
   if (Array.isArray(node.elements)) {
     node.elements.forEach(walk)
+  }
+  if (Array.isArray(node.declarations)) {
+    node.declarations.forEach(walk)
+  }
+  if (node.init) {
+    walk(node.init)
   }
 }
 walk(parsed)
