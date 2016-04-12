@@ -79,6 +79,7 @@
     "@cycle/core": "6.0.3",
     "@cycle/dom": "9.4.0",
     "check-more-types": "2.20.2",
+    "escodegen": "1.8.0",
     "esprima": "2.7.2",
     "lazy-ass": "1.4.0",
     "rx": "4.1.0"
