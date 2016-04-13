@@ -1,11 +1,11 @@
 // v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
+function Item (fun, array) {
+  this.fun = fun
+  this.array = array
 }
 Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
+  this.fun.apply(null, this.array)
+}
 function Foo () {
   // not used
 }
