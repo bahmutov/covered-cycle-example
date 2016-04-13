@@ -59,8 +59,10 @@
     "server": "http-server",
     "proxy": "rm -rf html-report scripts && was-tested --target http://127.0.0.1:8080",
     "nyc": "nyc node shake-example/proto.js",
+    "babel-original": "babel dist/app.js --presets es2015 -o dist/app.es5.js",
     "babel": "babel dist/app-covered.js --presets es2015 -o dist/app-covered.es5.js",
-    "uglify": "grunty grunt-contrib-uglify uglify --src=dist/app-covered.js --dest=dist/app-covered.min.js"
+    "uglify": "grunty grunt-contrib-uglify uglify --src=dist/app-covered.js --dest=dist/app-covered.min.js",
+    "uglify-original": "uglifyjs dist/app.es5.js --compress --mangle --screw-ie8 -o dist/app.es5.min.js"
   },
   "devDependencies": {
     "babel-cli": "6.7.5",
@@ -80,6 +82,7 @@
     "semantic-release": "^4.3.5",
     "standard": "6.0.8",
     "standard-format": "2.1.1",
+    "uglifyjs": "2.4.10",
     "was-tested": "0.10.0",
     "webpack": "1.12.15"
   },
