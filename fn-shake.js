@@ -5,6 +5,7 @@ const is = require('check-more-types')
 const fs = require('fs')
 const esprima = require('esprima')
 const escodegen = require('escodegen')
+const protoUtils = require('./src/prototype-utils')
 
 // do not remove some functions for now
 function shouldKeep (fnNode) {
@@ -34,9 +35,9 @@ function shouldKeep (fnNode) {
   ]
   const name = fnNode.id.name
   return is.oneOf(keepFunctions, name) ||
-    /Observable$/.test(name) ||
-    /Observer$/.test(name) ||
-    /Disposable$/.test(name)
+  /Observable$/.test(name) ||
+  /Observer$/.test(name) ||
+  /Disposable$/.test(name)
 }
 
 const coverFilename = './scripts/coverage.json'
@@ -75,7 +76,23 @@ console.log('has coverage information about', Object.keys(fnMap).length, 'functi
 var foundFunctions = 0
 var removed = 0
 
-function findCoveredFunction(line, column) {
+function findCoveredFunctionByName (name) {
+  la(is.unemptyString(name), 'missing function name', name)
+  var found
+  Object.keys(fnMap).some((k) => {
+    const fn = fnMap[k]
+    if (fn.name === name) {
+      found = {
+        fn: fn,
+        covered: f[k]
+      }
+      return true
+    }
+  })
+  return found
+}
+
+function findCoveredFunction (line, column) {
   la(is.number(line) && is.number(column),
     'missing function start line or column', line, column)
   var found
@@ -93,8 +110,25 @@ function findCoveredFunction(line, column) {
   return found
 }
 
-function walk(node, index, list) {
+function walk (node, index, list) {
   // console.log(node.type)
+
+  // if (node.type === 'BlockStatement') {
+  //   console.log('block statement')
+  //   console.log(node)
+  // }
+  // if (node.type === 'ExpressionStatement') {
+  //   console.log('expression statement')
+  //   console.log(node)
+  // }
+
+  var removeMe = is.fn(index) ? index : function removeMe () {
+    if (Array.isArray(list)) {
+      list.splice(index, 1)
+      removed += 1
+    }
+  }
+
   if (node.type === 'FunctionDeclaration') {
     foundFunctions += 1
     // console.log(node.id.name)
@@ -104,9 +138,7 @@ function walk(node, index, list) {
     const info = findCoveredFunction(line, column)
     if (info && !info.covered) {
       if (!shouldKeep(node)) {
-        // console.log('function "%s" is not covered, removing', node.id.name)
-        list.splice(index, 1)
-        removed += 1
+        removeMe()
       }
     }
   }
@@ -121,13 +153,20 @@ function walk(node, index, list) {
       if (!shouldKeep(node)) {
         // console.log('function expression "%s" is not covered, removing',
         //   (node.id ? node.id.name : 'unnamed'))
-        if (Array.isArray(list)) {
-          list.splice(index, 1)
-          removed += 1
-        } else {
-          // console.log('cannot remove - no parent list')
-        }
+        removeMe()
       }
+    }
+  }
+
+  if (protoUtils.isPrototypePropertyAssignment(node) ||
+    protoUtils.isPrototypeAssignment(node)) {
+    const protoName = protoUtils.prototypeOf(node)
+    la(is.unemptyString(protoName), 'could not get prototype name', node)
+    const info = findCoveredFunctionByName(protoName)
+    if (info && !info.covered) {
+      console.log('assignment to unused prototype of', protoName,
+        'at line', node.loc.start.line)
+      removeMe()
     }
   }
 
@@ -144,7 +183,10 @@ function walk(node, index, list) {
     walk(node.argument)
   }
   if (is.object(node.expression)) {
-    walk(node.expression)
+    walk(node.expression, function () {
+      // console.log('removing expression')
+      removeMe()
+    })
   }
   if (node.left) {
     walk(node.left)

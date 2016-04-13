@@ -5,6 +5,7 @@ const is = require('check-more-types')
 const fs = require('fs')
 const esprima = require('esprima')
 const escodegen = require('escodegen')
+const protoUtils = require('../src/prototype-utils')
 
 const sourceFilename = './proto.js'
 la(fs.existsSync(sourceFilename), 'missing source file', sourceFilename)
@@ -18,29 +19,22 @@ console.log('parsed', sourceFilename)
 
 function walk (node, index, list) {
   // console.log(node.type)
+  if (node.type === 'AssignmentExpression') {
+    if (protoUtils.isPrototypePropertyAssignment(node) || protoUtils.isPrototypeAssignment(node)) {
+      console.log('assignment to prototype of', protoUtils.prototypeOf(node),
+        'at line', node.loc.start.line)
+    }
+  }
   if (node.type === 'FunctionDeclaration') {
     console.log(node.type, node.id.name)
     const line = node.loc.start.line
     const column = node.loc.start.column
   }
   if (node.type === 'FunctionExpression') {
-    console.log(node.type, node.id.name)
+    console.log(node.type, node.id ? node.id.name : 'no name')
     const line = node.loc.start.line
     const column = node.loc.start.column
-    // console.log('function expressions "%s" starts at line %d column %d', node.id.name, line, column)
-    const info = findCoveredFunction(line, column)
-    if (info && !info.covered) {
-      if (!shouldKeep(node)) {
-        // console.log('function expression "%s" is not covered, removing',
-        //   (node.id ? node.id.name : 'unnamed'))
-        if (Array.isArray(list)) {
-          list.splice(index, 1)
-          removed += 1
-        } else {
-          // console.log('cannot remove - no parent list')
-        }
-      }
-    }
+  // console.log('function expressions "%s" starts at line %d column %d', node.id.name, line, column)
   }
 
   if (Array.isArray(node.body)) {
@@ -94,7 +88,7 @@ const codeOptions = {
   }
 }
 const output = escodegen.generate(parsed, codeOptions)
-const outputFilename = './dist/app-covered.js'
-fs.writeFileSync(outputFilename, output, 'utf8')
-console.log('removed %d unused functions from %d found', removed, foundFunctions)
-console.log('output code with uncovered functions removed saved to', outputFilename)
+console.log(output)
+// const outputFilename = './dist/app-covered.js'
+// fs.writeFileSync(outputFilename, output, 'utf8')
+// console.log('output code with uncovered functions removed saved to', outputFilename)
