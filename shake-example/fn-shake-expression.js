@@ -17,7 +17,7 @@ const parsed = esprima.parse(source, parseOptions)
 console.log('parsed', sourceFilename)
 // console.log(parsed)
 
-function walk(node, parent, index) {
+function walk (node, parent, index) {
   console.log(node.type)
   // console.log(node)
   // if (node.type === 'ExpressionStatement') {
@@ -74,7 +74,6 @@ function walk(node, parent, index) {
   }
 }
 walk(parsed)
-
 
 // const codeOptions = {
 //   format: {

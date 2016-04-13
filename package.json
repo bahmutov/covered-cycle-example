@@ -45,7 +45,7 @@
   "scripts": {
     "ban": "ban",
     "deps": "deps-ok",
-    "format": "standard-format -w index.js src/*.js",
+    "format": "standard-format -w index.js src/*.js shake-example/*.js",
     "issues": "git-issues",
     "license": "license-checker --production --onlyunknown --csv",
     "lint": "standard --verbose index.js src/*.js",

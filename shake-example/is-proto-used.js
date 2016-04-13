@@ -16,7 +16,7 @@ const source = fs.readFileSync(sourceFilename, 'utf8')
 const parsed = esprima.parse(source, parseOptions)
 console.log('parsed', sourceFilename)
 
-function walk(node, index, list) {
+function walk (node, index, list) {
   // console.log(node.type)
   if (node.type === 'FunctionDeclaration') {
     console.log(node.type, node.id.name)

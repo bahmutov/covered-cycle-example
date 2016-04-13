@@ -35,7 +35,7 @@ console.log('has coverage information about', Object.keys(fnMap).length, 'functi
 //   console.log('function', fn.name, fn, 'is covered?', f[k])
 // })
 
-function findCoveredFunction(line, column) {
+function findCoveredFunction (line, column) {
   la(is.number(line) && is.number(column),
     'missing function start line or column', line, column)
   var found
@@ -53,9 +53,9 @@ function findCoveredFunction(line, column) {
   return found
 }
 
-function setCharAt(str,index,chr) {
-  if(index > str.length-1) return str;
-  return str.substr(0,index) + chr + str.substr(index+1);
+function setCharAt (str, index, chr) {
+  if (index > str.length - 1) return str
+  return str.substr(0, index) + chr + str.substr(index + 1)
 }
 
 function blank (text, from, to) {
@@ -72,7 +72,7 @@ function blank (text, from, to) {
 }
 
 var sourceBlanked = source
-function walk(node, parent, index) {
+function walk (node, parent, index) {
   console.log(node.type, node)
 
   if (node.type === 'FunctionDeclaration') {

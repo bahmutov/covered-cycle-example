@@ -1,4 +1,4 @@
-(function closure() {
+;(function closure () {
   var b
   var p = {}
   // var o = b = (function outer(out) {
@@ -7,15 +7,15 @@
   //   }
   // }(p))
 
-  var k = 'k' || function sub(a, b) {
+  var k = 'k' || function sub (a, b) {
     return a - b
   }
 
   console.log('something else')
 
-  ;(function foo() {
+  ;(function foo () {
     console.log('inside function foo')
-    return function nothing() {
+    return function nothing () {
       console.log('inside function nothing')
     }
   }).call(this)

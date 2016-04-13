@@ -1,4 +1,4 @@
-(function closure() {
+;(function closure () {
   // need to get inside closures
   function add (a, b) {
     return a + b
