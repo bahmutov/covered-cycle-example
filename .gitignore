@@ -2,3 +2,5 @@ node_modules/
 html-report/
 scripts/
 .nyc_output/
+dist/app-covered.es5.min.tar.gz
+dist/app.es5.min.tar.gz
