@@ -63,7 +63,9 @@
     "babel-original": "babel dist/app.js --presets es2015 -o dist/app.es5.js",
     "babel": "babel dist/app-covered.js --presets es2015 -o dist/app-covered.es5.js",
     "uglify": "grunty grunt-contrib-uglify uglify --src=dist/app-covered.js --dest=dist/app-covered.min.js",
-    "uglify-original": "uglifyjs dist/app.es5.js --compress --mangle --screw-ie8 -o dist/app.es5.min.js"
+    "uglify-original": "uglifyjs dist/app.es5.js --compress --mangle --screw-ie8 -o dist/app.es5.min.js",
+    "gzip-original": "tar -cvzf dist/app.es5.min.tar.gz dist/app.es5.min.js",
+    "gzip": "tar -cvzf dist/app-covered.es5.min.tar.gz dist/app-covered.es5.min.js"
   },
   "devDependencies": {
     "babel-cli": "6.7.5",
