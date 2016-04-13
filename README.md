@@ -11,6 +11,19 @@
 ![screenshot](screenshots/covered-cycle-app.png)
 ![initial coverage](screenshots/coverage-initial.png)
 
+The difference in timing when browser loads original minified bundle vs bundle with unused
+code removed (160ms vs 80ms)
+
+![original timing](screenshots/script-time-original.png)
+![unused code removed timing](screenshots/script-time-covered.png)
+
+Difference in bundle sizes (use `ls -lh dist`)
+
+```
+Minified bundle: 199KB vs 141KB
+gzipped file: 50KB vs 38KB
+```
+
 ### Small print
 
 Author: Gleb Bahmutov &lt;gleb.bahmutov@gmail.com&gt; &copy; 2016
