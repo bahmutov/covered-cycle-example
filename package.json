@@ -58,10 +58,14 @@
     "build": "webpack && ls -l dist",
     "server": "http-server",
     "proxy": "rm -rf html-report scripts && was-tested --target http://127.0.0.1:8080",
-    "nyc": "nyc node shake-example/proto.js"
+    "nyc": "nyc node shake-example/proto.js",
+    "babel": "babel index.js --presets es2015-native-modules -o dist/app.babel.js"
   },
   "devDependencies": {
+    "babel-cli": "6.7.5",
+    "babel-preset-es2015-native-modules": "6.6.0",
     "ban-sensitive-files": "1.8.2",
+    "deps-ok": "1.1.0",
     "git-issues": "1.2.0",
     "http-server": "0.9.0",
     "license-checker": "5.1.0",
