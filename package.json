@@ -19,7 +19,8 @@
         "npm run size"
       ],
       "post-commit": [],
-      "post-merge": []
+      "post-merge": [],
+      "post-checkout": "npm install"
     }
   },
   "files": [
