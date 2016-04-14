@@ -12,6 +12,8 @@ I made single Cycle.js application bundle, then ran it through code coverage pro
 [was-tested](https://github.com/bahmutov/was-tested) then removed functions that were unused.
 This eliminated some JavaScript and made bundle loading faster.
 
+Demo at [glebbahmutov.com/covered-cycle-example](https://glebbahmutov.com/covered-cycle-example/)
+
 ![screenshot](screenshots/covered-cycle-app.png)
 ![initial coverage](screenshots/coverage-initial.png)
 
