@@ -8,11 +8,15 @@
 [![semantic-release][semantic-image] ][semantic-url]
 [![js-standard-style][standard-image]][standard-url]
 
+I made single Cycle.js application bundle, then ran it through code coverage proxy 
+[was-tested](https://github.com/bahmutov/was-tested) then removed functions that were unused.
+This eliminated some JavaScript and made bundle loading faster.
+
 ![screenshot](screenshots/covered-cycle-app.png)
 ![initial coverage](screenshots/coverage-initial.png)
 
 The difference in timing when browser loads original minified bundle vs bundle with unused
-code removed (160ms vs 80ms)
+code removed (160ms vs 100ms)
 
 ![original timing](screenshots/script-time-original.png)
 ![unused code removed timing](screenshots/script-time-covered.png)

@@ -67,7 +67,8 @@
     "gzip-original": "tar -cvzf dist/app.es5.min.tar.gz dist/app.es5.min.js",
     "gzip": "tar -cvzf dist/app-covered.es5.min.tar.gz dist/app-covered.es5.min.js",
     "original": "npm run build && npm run babel-original && npm run uglify-original && npm run gzip-original",
-    "covered": "node fn-shake.js && npm run babel && npm run uglify && npm run gzip"
+    "covered": "node fn-shake.js && npm run babel && npm run uglify && npm run gzip",
+    "deploy": "grunty grunt-gh-pages gh-pages deploy.json"
   },
   "devDependencies": {
     "babel-cli": "6.7.5",
@@ -77,6 +78,7 @@
     "deps-ok": "1.1.0",
     "git-issues": "1.2.0",
     "grunt-contrib-uglify": "1.0.1",
+    "grunt-gh-pages": "1.1.0",
     "grunty": "0.3.0",
     "http-server": "0.9.0",
     "license-checker": "5.1.0",
